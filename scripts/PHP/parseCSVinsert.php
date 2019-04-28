@@ -11,7 +11,7 @@ $days = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 require "db_conf.php"; // set servername,username,password,and dbname
 //$filePath = "../../CSV_FILE_HERE";                //set this to the path that an admin specifies in their personal filesystem on seperate page, send to this script
 $csvFileName = $argv[1];
-$filePath = "../../$csvFileName";
+$filePath = "$csvFileName";
 $csv = file_get_contents($filePath, FILE_USE_INCLUDE_PATH);
 $lines = explode("\n", $csv);
 // remove the first element from the array
@@ -35,8 +35,8 @@ for ($i = 0; $i < count($data); $i++) {
         $endTime = substr_replace($data[$i]['Course End Time'], ":", 2, 0) . ':00';
     }
 
-    echo $startTime . '<br>';
-    echo $endTime . '<br>';
+    // echo $startTime . '<br>';
+    // echo $endTime . '<br>';
 
     $termStart = DateTime::createFromFormat('j-M-y', $data[$i]['Course Start Date']);
     $termStart = $termStart->format('Y-m-d');
@@ -45,17 +45,17 @@ for ($i = 0; $i < count($data); $i++) {
     $occur = "weekly";
 
 
-    echo $termStart . '<br>';
-    echo $termEnd . '<br>';
+    // echo $termStart . '<br>';
+    // echo $termEnd . '<br>';
 
     $roomnumber = $data[$i]['Building Name'] . ' ' . $data[$i]['Room Number'];
-    echo $roomnumber . '<br>';
+    // echo $roomnumber . '<br>';
     $owneremail = "N/A";
     // not sharing for lectures
     $allowshare = 0;
     $headcount = $data[$i]['Course Enrollment'];
     $comment = "Automated reservation by parseCSV.php";
-    echo $headcount . '<br>';
+    // echo $headcount . '<br>';
 
     // skip the inner loop for now until we understand how the new databse table works.
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -63,38 +63,45 @@ for ($i = 0; $i < count($data); $i++) {
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
+    
     $intTermStart = strtotime($termStart);
     $intTermEnd = strtotime($termEnd);
     $dateIterator = $intTermStart;
+    
     while ($dateIterator <= $intTermEnd) {
         $weekdayNum = date('w', $dateIterator);
         $day = $days[$weekdayNum % 7];
         $dayIndicator = $day . ' ' . 'Indicator';
-        echo $dayIndicator . "<br>";
+        // echo $dayIndicator . "<br>";
         if ($data[$i][$dayIndicator] != NULL) {
 
-            echo 'NON NULL DATE:' . date('Y-m-d', $dateIterator);
-            echo "<br>";
-            print_r($data[$i][$dayIndicator]);
-             $dateToInsert = date("Y-m-d", $dateIterator);
-              $collisionID = md5($roomnumber . $owneremail . $allowshare . $headcount . $termStart . $termEnd . $dateToInsert . $dateToInsert . $startTime . $endTime . $occur . $comment . $owneremail);
-              echo "<br>$collisionID</br>";
-              $sql = "INSERT INTO reservations (roomnumber, owneremail, allowshare, headcount, termstart, termend, startdate, enddate, starttime, endtime, occur, comment, res_email, unique_identifier)
-              VALUES ('$roomnumber', '$owneremail', '$allowshare', '$headcount', '$termStart', '$termEnd', '$dateToInsert', '$dateToInsert', '$startTime', '$endTime', '$occur', '$comment', '$owneremail', '$collisionID')";
+            // echo 'NON NULL DATE:' . date('Y-m-d', $dateIterator);
+            // echo "<br>";
+            // print_r($data[$i][$dayIndicator]);
+            
+            $dateToInsert = date("Y-m-d", $dateIterator);
+            $collisionID = md5($roomnumber . $owneremail . $allowshare . $headcount . $termStart . $termEnd . $dateToInsert . $dateToInsert . $startTime . $endTime . $occur . $comment . $owneremail);
+            // echo "<br>$collisionID</br>";
+            // echo "\n \n" . $roomnumber . ' ' . $owneremail . ' ' . $allowshare . ' ' . $headcount . ' ' . $termStart . ' ' . $termEnd . ' ' . $dateToInsert . ' ' . $dateToInsert . ' ' . $startTime . ' ' . $endTime . ' ' . $occur . ' ' . $comment . ' ' . $owneremail . "\n\n";
 
-
-              if ($conn->query($sql) === TRUE) {
-              echo "New record created successfully";
-              } else {
-              echo "Error: " . $sql . "<br>" . $conn->error;
-              }
-             
+            
+            $sql = "INSERT INTO reservations (roomnumber, owneremail, allowshare, headcount, termstart, termend, startdate, enddate, starttime, endtime, occur, comment, res_email, unique_identifier)
+                    VALUES ('$roomnumber', '$owneremail', '$allowshare', '$headcount', '$termStart', '$termEnd', '$dateToInsert', '$dateToInsert', '$startTime', '$endTime', '$occur', '$comment', '$owneremail', '$collisionID')";
+           // $sqlFile = file_put_contents('C:/xampp/htdocs/SchedulingApp/argos/argosInsert.sql', $sql.PHP_EOL, FILE_APPEND | LOCK_EX);
+            
+            
+            if ($conn->query($sql) === TRUE) {
+              echo "New record created successfully \r\n";
+            } else {
+              echo "Error: " . $sql . "\r\n" . $conn->error . "\r\n \r\n";
+            }
+            
         }
 
 
          
         //echo date('Y-m-d', $dateIterator);
-        echo "<br>----------<br>";
+        // echo "<br>----------<br>";
         $dateIterator = $dateIterator + 86400;
     }
 }

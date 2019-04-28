@@ -45,7 +45,7 @@ if (isset ( $_POST ['submit'] )){
 	$floor = $_POST ['floor'];
 	$seats = ( int ) $_POST ['seats'];
 	$numComputers = ( int ) $_POST ['numcomputers'];
-	$limit = $_POST['limit'];
+	$limitusers = $_POST['limitusers'];
 
 	saveChanges($conn, $beingEdited, $_POST);
 	header("Location: userSettings.php");
@@ -59,7 +59,7 @@ function saveChanges($conn, $beingEdited, $post_vars){
 	$floor = $post_vars ['floor'];
 	$seats = ( int ) $post_vars ['seats'];
 	$numComputers = ( int ) $post_vars ['numcomputers'];
-	$limit = $post_vars['limit'];
+	$limitusers = $post_vars['limitusers'];
 	
 	if($numComputers <= 0){
 		$hasComputers = 0;
@@ -69,7 +69,7 @@ function saveChanges($conn, $beingEdited, $post_vars){
 	}
 	
 	
-	if($limit == "off")
+	if($limitusers == "off")
 	{
 		// If the checkbox "Limit Reservations" has been checked, set the flag to 1 (true)
 		$areLimiting = 0;
