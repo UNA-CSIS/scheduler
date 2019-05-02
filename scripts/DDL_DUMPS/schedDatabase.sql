@@ -46,24 +46,6 @@ CREATE TABLE IF NOT EXISTS `favorites` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=204 DEFAULT CHARSET=latin1;
 
--- Dumping data for table cs455.favorites: ~10 rows (approximately)
-/*!40000 ALTER TABLE `favorites` DISABLE KEYS */;
-INSERT INTO `favorites` (`email`, `roomid`, `id`) VALUES
-	('dbrown4@una.edu', 'Keller 122', 74),
-	('dbrown4@una.edu', 'Keller 133', 81),
-	('dbrown4@una.edu', 'Keller 220', 91),
-	('dbrown4@una.edu', 'Keller 320', 93),
-	('dbrown4@una.edu', 'Keller 222', 96),
-	('super', 'Keller 220', 195),
-	('super', 'Keller 222', 196),
-	('super', 'Keller 233', 197),
-	('admin@una.edu', 'Keller 122', 198),
-	('admin@una.edu', 'Keller 233', 199),
-	('admin@una.edu', 'Keller 221', 200),
-	('user@una.edu', 'Raburn 305', 201),
-	('user@una.edu', 'Raburn 210', 202),
-	('user@una.edu', 'Raburn 207', 203);
-/*!40000 ALTER TABLE `favorites` ENABLE KEYS */;
 
 -- Dumping structure for table cs455.groups
 CREATE TABLE IF NOT EXISTS `groups` (

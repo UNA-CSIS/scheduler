@@ -1,0 +1,6 @@
+To do for implementing the ARGOS auto import:
+    -Set the CRON command to automatically call '/scripts/SH/argosUpdate.sh'
+    -Have ITS put the NEW INCOMING .csv file in '/argos' and name it course_info.csv
+    -Set the paths in '/scripts/SH/argosUpdate.sh' to the SERVER paths that point to their respective files
+    
+Once those steps are done, the update will automatically insert into the database

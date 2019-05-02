@@ -23,6 +23,9 @@
 # -----------------------------------------------------------------------------------------------
 
 
+#Point to /argos/course_info.csv and /argos/course_info_old.csv
+
+
 # Server version
 #old="/var/www/html/argos/course_info_old.csv"
 #new="/var/www/html/argos/course_info.csv"
@@ -30,6 +33,11 @@
 # Local version
  old="C:/xampp/htdocs/SchedulingApp/argos/course_info_old.csv"
  new="C:/xampp/htdocs/SchedulingApp/argos/course_info.csv"
+
+# -----------------------------------------------------------------------------------------------
+
+
+#Point to /argos/unique_to_old.csv and /argos/unique_to_new.csv
 
 # Server version
 #unique_to_old="/var/www/html/argos/unique_to_old.csv"
@@ -48,82 +56,88 @@ touch $unique_to_new
 >$unique_to_old
 >$unique_to_new
 
-# For 'comm [OPTION]... FILE1 FILE2'
-#  -1              suppress column 1 (lines unique to FILE1)
-#  -2              suppress column 2 (lines unique to FILE2)
-#  -3              suppress column 3 (lines that appear in both files)
-#  --check-order   check that the input is correctly sorted, even if all input lines are pairable
 
-# We may have to remove the () from the sorts when moved into production
-# Got conflicting results when tried on the C9 bash environment and a windows environment
+# -----------------------------------------------------------------------------------------------
 
+# This is our default header that we will tack on to the data. This is done to sanitize the comparison in case something is broken with the header in one of the files
 header='"Term Code","Term Description","Full/Part Term Description","Course CRN","Course Subject","Course Number","Course Sequence Number","Building Name","Room Number","Course Start Time","Course End Time","Course Start Date","Course End Date","Sunday Indicator","Monday Indicator","Tuesday Indicator","Wednesday Indicator","Thursday Indicator","Friday Indicator","Saturday Indicator","Course Maximum Enrollment","Course Enrollment"'
+
+# -----------------------------------------------------------------------------------------------
+
 
 if [[ -s $new ]]
 then
+    # Remove the possibility of conflicting header styles by getting rid of them completely
     printf "%s\n" "$(tail -n +2 $old)" > $old
     printf "%s\n" "$(tail -n +2 $new)" > $new
     
+
+    # We may have to remove the () from the sorts when moved into production
+    # Got conflicting results when tried on the C9 bash environment and a windows environment
     comm -2 -3 <(sort $old) <(sort $new) > $unique_to_old # Put items unique to the old version of the class times/locations here
     comm -1 -3 <(sort $old) <(sort $new) > $unique_to_new # Put items unique to the new version of the class times/locations here
 
 
     if [[ -s $unique_to_old ]]; # There were items we need to delete
     then
-        # Local version
-        # uniqueDelete="C:/xampp/htdocs/SchedulingApp/argos/uniqueDelete.csv"
-     
-        echo "We have some out of date information, time to delete it";
+        # -----------------------------------------------------------------------------------------------
         
+        
+        # Point to '/argos/classesToDelete.csv'
         # Local version
          deleteCSV="C:/xampp/htdocs/SchedulingApp/argos/classesToDelete.csv"
         
         # Server version
         #deleteCSV="/var/www/html/argos/classesToDelete.csv"
         
+        # -----------------------------------------------------------------------------------------------
+        
         
         # Need the following in the header of the classesToDelete.csv files for associative array headers
         echo $header > $deleteCSV;
         cat $unique_to_old >> $deleteCSV
         
+        
+        # -----------------------------------------------------------------------------------------------
+        
+        # Point to '/scripts/PHP/parseCSVdelete.php'
         # Local version
-         deletePHP="C:/xampp/htdocs/SchedulingApp/scripts/PHP/parseCSVdelete.php"
-        # deleteSQL="C:/xampp/htdocs/SchedulingApp/argos/argosDelete.sql"
+        deletePHP="C:/xampp/htdocs/SchedulingApp/scripts/PHP/parseCSVdelete.php"
         
         # Server version
         #deletePHP="/var/www/html/scripts/PHP/parseCSVdelete.php"
+        
+        # -----------------------------------------------------------------------------------------------
                 
         php $deletePHP $deleteCSV
-        
     fi
         
     if [[ -s $unique_to_new ]]; # There were items we need to add
     then
         
+        # -----------------------------------------------------------------------------------------------
+        # Point to '/argos/classesToInsert.csv'
         # Local version
-         insertCSV="C:/xampp/htdocs/SchedulingApp/argos/classesToInsert.csv"
+        insertCSV="C:/xampp/htdocs/SchedulingApp/argos/classesToInsert.csv"
         
+        # Server version
         #insertCSV="/var/www/html/argos/classesToInsert.csv"
-        
-        echo "We have classes to insert in to the reservations table";
-        
+        # -----------------------------------------------------------------------------------------------
+
         # Need the following in the header of the uniqueInsert.csv files for associative array headers
         echo $header > $insertCSV;
         cat $unique_to_new >> $insertCSV
         
         
-        # Now, call the php file to get the stuff into the .sql files
-         insertPHP="C:/xampp/htdocs/SchedulingApp/scripts/PHP/parseCSVinsert.php"
-        # insertSQL="C:/xampp/htdocs/SchedulingApp/argos/argosInsert.sql"
-        
-        # Note that insertSQL was used purely for debugging
+        # -----------------------------------------------------------------------------------------------
+        # Point to '/scripts/PHP/parseCSVinsert.php'
+        # Local version
+        insertPHP="C:/xampp/htdocs/SchedulingApp/scripts/PHP/parseCSVinsert.php"
         
         # Server version
         #insertPHP="/var/www/html/scripts/PHP/parseCSVinsert.php"
-        
-        
-        # >$insertSQL
-        
+        # -----------------------------------------------------------------------------------------------
+
         php $insertPHP $insertCSV
         
         # Remove old file, rename new file to old
@@ -142,11 +156,11 @@ then
         
     else
         echo "Nothing to update";
-        #rm $new
+        rm $new
         # Do nothing, there were no changes in ARGOS
     fi
     
     
-else
+else # Something messed up big time! Empty course_info.csv file causes this.
     echo "Error: Empty incoming data!";
 fi
