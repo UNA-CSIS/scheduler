@@ -147,7 +147,15 @@ then
         
         # Since at the time of writing this we have no idea if the header block will look like the $header variable or slightly different,
         # we decided to get rid of the possibility completely by removing the first of it and then cat the one we have
+        
+        # -----------------------------------------------------------------------------------------------
+        # Local version
         temp="C:/xampp/htdocs/SchedulingApp/argos/temp.csv"
+        
+        # Server version
+        # temp="/var/www/html/argos/temp.csv"
+        # -----------------------------------------------------------------------------------------------        
+        
         touch $temp
         echo $header > $temp
         cat $old >> $temp

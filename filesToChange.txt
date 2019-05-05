@@ -1,0 +1,6 @@
+WHEN MOVING FROM LOCAL TESTING TO SERVER, CHANGE PATHS IN THE FOLLOWING FILES:
+
+/scripts/SH/argosUpdate.sh
+
+
+(there is one to do with the header box, but I cannot find/remember it at this time)
